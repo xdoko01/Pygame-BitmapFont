@@ -123,7 +123,7 @@ class BitmapFont():
         
         # Evaluate the font image path
         font_image_path = Path(self.path.parent, font_data.get('font_image')).resolve() # Try to evaluate as relative to font file path
-        print(f'DEBUG: {self.path=}, {self.path.parent=}, {font_image_path=}, {font_image_path.is_file()=}')
+        #print(f'DEBUG: {self.path=}, {self.path.parent=}, {font_image_path=}, {font_image_path.is_file()=}')
 
         if not font_image_path.is_file():
             font_image_path = Path(font_data.get('font_image')) # If not successful evaluate as relative to py project path
@@ -131,7 +131,7 @@ class BitmapFont():
         assert font_image_path.is_file() == True, f'Cannot find font image file at "{font_image_path}"'
         self.font_image_path = font_image_path
 
-        print(f'DEBUG: {self.path=}, {self.path.parent=}, {font_image_path=}')
+        #print(f'DEBUG: {self.path=}, {self.path.parent=}, {font_image_path=}')
 
         try:
             assert color != self.colorkey, 'Color cannot be the same as the color key'
