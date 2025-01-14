@@ -3,7 +3,7 @@
 ########################################################
 
 import pygame # for game window
-from bitmap_font import BitmapFont, BitmapFont2 # for bitmap font usage
+from bitmap_font import BitmapFontFixedHeight, BitmapFontFreeDims # for bitmap font usage
 import sys, pathlib
 
 pygame.init()
@@ -14,22 +14,22 @@ screen = pygame.display.set_mode((500, 500), 0, 32)
 FONT_PATH = pathlib.Path('fonts')
 
 # One way to init font
-my_first_font = BitmapFont(path=FONT_PATH / 'small_font.json', color=pygame.Color('grey'))
+my_first_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json', color=pygame.Color('grey'))
 
 # Other way to init font (size included)
-my_second_font = BitmapFont(path=FONT_PATH / 'small_font.json',  size=16)
+my_second_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json',  size=16)
 
 # Yet another way ti init font (color included)
-my_third_font = BitmapFont(path=FONT_PATH /'small_font.json', size=16, color=pygame.Color('purple'))
+my_third_font = BitmapFontFixedHeight(path=FONT_PATH /'small_font.json', size=16, color=pygame.Color('purple'))
 
 # Yet another font - gradient
-my_fourth_font = BitmapFont(path=FONT_PATH /'red_gradient_capital_font.json', size=16)
+my_fourth_font = BitmapFontFixedHeight(path=FONT_PATH /'red_gradient_capital_font.json', size=16)
 
 # Yet another font - good neighbours
-my_fifth_font = BitmapFont(path=FONT_PATH /'good_neighbours_font.json', size=32, color=pygame.Color('blue'))
+my_fifth_font = BitmapFontFixedHeight(path=FONT_PATH /'good_neighbours_font.json', size=32, color=pygame.Color('blue'))
 
 # Yet another font - Quake 1 font
-my_first_fixed_font = BitmapFont2(path=FONT_PATH /'charset_id1.json', size=20)
+my_first_fixed_font = BitmapFontFreeDims(path=FONT_PATH /'charset_id1.json', size=20)
 
 
 while True:

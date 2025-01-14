@@ -1,39 +1,3 @@
-''' Module for handling bitmap fonts
-
-    Bitmap font is defined by picture and json definition. Picture needs to be in
-    non-data-loss format (png/bmp).
-
-    For the definition of the JSON files see individual fonts in separate Python 
-    files.
-
-    For creation of the font from the image, you can use the Extractor tool from
-    the 'tools' folder.
-
-    All bitmap fonts must implement the BitmapFont prototype in order to be used
-    interchangibly.
-'''
-########################################################
-### Prototype class
-########################################################
-import pygame
-from typing import Protocol
-
-class BitmapFont(Protocol):
-    """Interface all bitmap fonts must implement"""
-    def __init__(self, path: str, size: int):
-        pass
-
-    def render(self, text: str) -> pygame.Surface:
-        pass
-
-########################################################
-### Public Package classes
-########################################################
-__all__ = ['BitmapFontFixedHeight', 'BitmapFontFreeDims']
-
-from .bitmap_font_fixed_height import BitmapFontFixedHeight
-from .bitmap_font_free_dims import BitmapFontFreeDims
-
 ########################################################
 ### Internal Package functions
 ########################################################
@@ -93,4 +57,3 @@ def load_font_image(path: str, font_image: str) -> pygame.Surface:
     assert font_image_path.is_file() == True, f"Cannot find font image file at '{font_image_path}'."
 
     return pygame.image.load(font_image_path).convert()
-
