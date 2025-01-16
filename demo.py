@@ -8,7 +8,7 @@ import sys, pathlib
 
 pygame.init()
 pygame.display.set_caption('BitmapFont Demo - close the window for exit')
-screen = pygame.display.set_mode((500, 500), 0, 32)
+screen = pygame.display.set_mode((500, 500), pygame.SRCALPHA)
 
 # Where to find the JSON fonts
 FONT_PATH = pathlib.Path('fonts')
@@ -20,17 +20,19 @@ my_first_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json', color=
 my_second_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json',  size=16)
 
 # Yet another way ti init font (color included)
-my_third_font = BitmapFontFixedHeight(path=FONT_PATH /'small_font.json', size=16, color=pygame.Color('purple'))
+my_third_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json', size=16, color=pygame.Color('purple'))
 
 # Yet another font - gradient
-my_fourth_font = BitmapFontFixedHeight(path=FONT_PATH /'red_gradient_capital_font.json', size=16)
+my_fourth_font = BitmapFontFixedHeight(path=FONT_PATH / 'red_gradient_capital_font.json', size=16)
 
 # Yet another font - good neighbours
-my_fifth_font = BitmapFontFixedHeight(path=FONT_PATH /'good_neighbours_font.json', size=32, color=pygame.Color('blue'))
+my_fifth_font = BitmapFontFixedHeight(path=FONT_PATH / 'good_neighbours_font.json', size=32, color=pygame.Color('blue'))
 
 # Yet another font - Quake 1 font
-my_first_fixed_font = BitmapFontFreeDims(path=FONT_PATH /'charset_id1.json', size=20)
+my_first_fixed_font = BitmapFontFreeDims(path=FONT_PATH / 'charset_id1.json')
 
+# And another
+my_second_fixed_font = BitmapFontFreeDims(path=FONT_PATH / 'simple.json')
 
 while True:
 
@@ -57,6 +59,8 @@ while True:
 
     # Quake 1 font
     screen.blit(my_first_fixed_font.render(f'Quake font\nIs the greatest\nanyways! + centered', align='CENTER')[0], (50, 150))
+
+    screen.blit(my_second_fixed_font.render(f'Quake 2 font\nIs the greatest\nanyways!', align='LEFT')[0], (0, 0))
 
 
     for event in pygame.event.get():

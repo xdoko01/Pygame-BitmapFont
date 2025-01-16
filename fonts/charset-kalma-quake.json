@@ -1,6 +1,6 @@
 {
-    "font_image": "charset_id1.png",
-    "colorkey": "#FF00FF",
+    "font_image": "charset-kalma-quake.png",
+    "colorkey": "#000000",
     "chars": {
         "A": {
             "width": 16,
