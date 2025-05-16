@@ -13,14 +13,7 @@
 ###         'a': {x: 150, y:150, dx:16, dy:16}
 ###    }
 ###
-###    TODO: Navigate using arrow keys. When insert is pressed it will await keyboard input
-###    TODO: Showing saved cells does not work when first bigger area is selected but then shrinked and saved, the greater area is greyed out
 ###    TODO: Tab button will go through the grit from top left to bottom down
-###    TODO: json is not containing colorkey (automatic) and the font image path
-###    TODO: when insert is pressed, enter endless loop where checking for the key to be pressed.
-###    TODO: char_img is not transparent - detect and use colorkey
-###    TODO: implement selection using holding shift
-###    TODO: implement saving
 ########################################################
 import pygame
 from dataclasses import dataclass
@@ -59,7 +52,7 @@ def get_screen_topleft_cell_pos_from_mouse_px(mouse_pos: Vect, screen_cell_res_p
     """Get the top-left pixel position of a cell on the screen on which mouse is located."""
     return Vect(int((mouse_pos.x // screen_cell_res_px.x) * screen_cell_res_px.x), int((mouse_pos.y // screen_cell_res_px.y) * screen_cell_res_px.y))
 
-def get_char_img_from_cell_selection(font_img: pygame.Surface, img_cell_res_px: int, sel_start_cell: Vect, sel_finish_cell: Vect) -> pygame.Surface:
+def get_char_img_from_cell_selection(font_img: pygame.Surface, img_cell_res_px: int, sel_start_cell: Vect, sel_finish_cell: Vect) -> tuple[pygame.Surface, pygame.Rect]:
     """Get the character image from font texture given the start and end cell"""
     selection_most_topleft_cell = Vect(min(sel_start_cell.x, sel_finish_cell.x), min(sel_start_cell.y, sel_finish_cell.y))
     selection_most_botomright_cell = Vect(max(sel_start_cell.x, sel_finish_cell.x), max(sel_start_cell.y, sel_finish_cell.y))
@@ -67,41 +60,10 @@ def get_char_img_from_cell_selection(font_img: pygame.Surface, img_cell_res_px: 
     selection_cell_length = Vect(selection_most_botomright_cell.x - selection_most_topleft_cell.x+1, selection_most_botomright_cell.y - selection_most_topleft_cell.y+1)
     selection_img_topleft_px = get_img_topleft_cell_pos_from_cell_px(selection_most_topleft_cell, img_cell_res_px)
 
-    return clip(font_img, (selection_img_topleft_px.x, selection_img_topleft_px.y), (selection_cell_length.x * img_cell_res_px, selection_cell_length.y * img_cell_res_px))
-
-def save_char_img_on_key(font_img: pygame.Surface, img_cell_res_px: int, sel_start_cell: Vect, sel_finish_cell: Vect) -> None:
-    """Save the character image to the dictionary of characters"""
-    selection_most_topleft_cell = Vect(min(sel_start_cell.x, sel_finish_cell.x), min(sel_start_cell.y, sel_finish_cell.y))
-    selection_most_botomright_cell = Vect(max(sel_start_cell.x, sel_finish_cell.x), max(sel_start_cell.y, sel_finish_cell.y))
-
-    selection_cell_length = Vect(selection_most_botomright_cell.x - selection_most_topleft_cell.x+1, selection_most_botomright_cell.y - selection_most_topleft_cell.y+1)
-    selection_img_topleft_px = get_img_topleft_cell_pos_from_cell_px(selection_most_topleft_cell, img_cell_res_px)
-
-    print(f'Press the button under which the character will be saved...')
-    char_entered = False
-    while not char_entered:
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN: 
-                char = event.unicode
-                if char: # Is printable, save it 
-                    print(f"Key pressed: {char}")
-                    font_dict[char] = {
-                                'width': selection_cell_length.x * img_cell_res_px,
-                                'height': selection_cell_length.y * img_cell_res_px,
-                                'x': selection_img_topleft_px.x, # x-coord of the topleft corner in the original file
-                                'y': selection_img_topleft_px.y # y-coord of the topleft corner in the original file
-                            }
-                    print(f"Saved under key={char}, {font_dict[char]}")
-
-                    # Mark graphically as saved
-                    #saved = saved.union(selection)
-                    #print(f'Selected cells: {selection}, Already saved cells: {saved}')
-
-                    # End waiting for key pressed
-                    char_entered = True
-    
-    # Reset the selection
-    selection = set()
+    return (
+        clip(font_img, (selection_img_topleft_px.x, selection_img_topleft_px.y), (selection_cell_length.x * img_cell_res_px, selection_cell_length.y * img_cell_res_px)),
+        pygame.Rect(selection_img_topleft_px.x, selection_img_topleft_px.y, selection_cell_length.x * img_cell_res_px, selection_cell_length.y * img_cell_res_px)
+    )
 
 
 # Create an ArgumentParser object for processing the input
@@ -112,9 +74,10 @@ parser.add_argument("--out", type=str, help="Output JSON file", required=False)
 args = parser.parse_args()
 
 # Get from input line
-FONT_IMG = args.img if args.img else 'fonts/charset_id1.png'
+FONT_IMG = args.img if args.img else 'fonts/charset_moon1.png'
 FONT_JSON = args.out if args.out else FONT_IMG.split('/')[-1].split('.')[0] + '.jsonx'
 IMG_CELL_RES_PX = 16 # resolution of the grid cell on the original image
+COLORKEY_PIXEL_LOCATION = (0,0)
 
 POSITION_CELL_COLOR = (255,0,0,128) # Color of cell on which the cursor is located
 SELECTION_CELL_COLOR = (0,255,0,128) # Color of cells selected by mouse
@@ -127,9 +90,9 @@ GRID_COLOR = (0,255,0,128)
 
 HELP_TEXT = \
 '''Help
-1. Select the suitable grid resolution by '[', ']'
-2. Select the cell with texture
-3. Press ENTER to save the texture details into JSON
+1. Select the suitable grid resolution by 'PgUp', 'PgDown'
+2. Select the cell with texture by mouse and/or cursor keys
+3. Press INSERT to save the texture details into JSON
 Tips
  - once saved, the cell is grey
 Enjoy!
@@ -145,6 +108,12 @@ screen = pygame.display.set_mode(font_img.get_size(), flags=pygame.RESIZABLE)
 
 # Get the aspect ratio of the font image
 img_aspect_ratio = font_img.get_width() / font_img.get_height()
+
+# Get the colorkey of the image - get it from the most topleft pixel
+colorkey = font_img.get_at(COLORKEY_PIXEL_LOCATION)
+
+# Set the transparency based on the colorkey
+font_img.set_colorkey(colorkey)
 
 # Screen size
 screen_size = Vect(screen.get_width(), screen.get_height())
@@ -165,6 +134,7 @@ cell_save_rect_surface: pygame.Surface = None
 
 # Surface for character
 char_img: pygame.Surface = None
+char_img_dim: pygame.Rect = None
 
 # Create a font object
 font = pygame.font.Font(None, TEXT_SIZE)  # None means default font, 74 is the font size
@@ -174,6 +144,10 @@ show_help: bool = False
 
 # Render the help text
 help_text_surf = font.render(HELP_TEXT, True, TEXT_COLOR)
+
+# Cell where mouse is/was located
+cell_pos_from_mouse: Vect = None
+cell_pos_from_mouse_old: Vect = None
 
 # Remember selection of cells
 is_selection: bool = False
@@ -217,21 +191,23 @@ while True:
     # Recalculate the mouse coordinates within the displayable game window
     mouse = Vect(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
-    # Get the topleft position of the selected cell on the screen in px
-    screen_topleft_cell_pos_from_mouse_px = get_screen_topleft_cell_pos_from_mouse_px(mouse, screen_cell_res_px)
+    # Remember the last cell where mouse was positioned
+    cell_pos_from_mouse_old = cell_pos_from_mouse
 
     # Get the grid cell coordinates where the mouse cursor is located
     cell_pos_from_mouse = get_cell_pos_from_mouse(mouse, screen_cell_res_px)
-    
-    # Get the image px coordinates of the topleft and bottomright corner of the cell where the mouse is located
-    img_topleft_cell_pos_from_cell_px = get_img_topleft_cell_pos_from_cell_px(cell_pos_from_mouse, IMG_CELL_RES_PX)
-    img_bottomright_cell_pos_from_cell_px = Vect(img_topleft_cell_pos_from_cell_px.x + IMG_CELL_RES_PX, img_topleft_cell_pos_from_cell_px.y + IMG_CELL_RES_PX)
 
-    # Selection is the cell on which the cursor is - if there is not other selection
-    if not is_selection: sel_start_cell, sel_finish_cell = cell_pos_from_mouse, cell_pos_from_mouse
+    # if the mouse cell has changed
+    if cell_pos_from_mouse != cell_pos_from_mouse_old:
 
-    # Selected image of character
-    char_img = get_char_img_from_cell_selection(font_img, IMG_CELL_RES_PX, sel_start_cell, sel_finish_cell)
+        # Get the topleft position of the selected cell on the screen in px
+        screen_topleft_cell_pos_from_mouse_px = get_screen_topleft_cell_pos_from_mouse_px(mouse, screen_cell_res_px)
+
+        # Selection is the cell on which the cursor is - if there is not other selection
+        if not is_selection: sel_start_cell, sel_finish_cell = cell_pos_from_mouse, cell_pos_from_mouse
+
+        # Selected image of character and its position and dimensions on the original font image
+        char_img, char_img_dim = get_char_img_from_cell_selection(font_img, IMG_CELL_RES_PX, sel_start_cell, sel_finish_cell)
 
     ###################################
     # Display window elements
@@ -261,8 +237,16 @@ while True:
                 screen_topleft_cell_pos_from_cell_px = get_screen_topleft_cell_pos_from_cell_px(selected_cell, screen_cell_res_px)
                 screen.blit(cell_sel_rect_surface, (screen_topleft_cell_pos_from_cell_px.x, screen_topleft_cell_pos_from_cell_px.y))
 
+    # Show already saved cells
+    for c in saved:
+        screen_topleft_cell_pos_from_cell_px = get_screen_topleft_cell_pos_from_cell_px(c, screen_cell_res_px)
+        screen.blit(cell_save_rect_surface, (screen_topleft_cell_pos_from_cell_px.x, screen_topleft_cell_pos_from_cell_px.y))
+
+    # Show help
+    if show_help: screen.blit(help_text_surf, (0, 0))  # Position the text at (250, 250)
+
     # Display basic info to the window bar
-    pygame.display.set_caption(f'Extractor - res: {IMG_CELL_RES_PX}px, cell: {(cell_pos_from_mouse.x, cell_pos_from_mouse.y)}, topleft img: {img_topleft_cell_pos_from_cell_px}')
+    pygame.display.set_caption(f'Extractor - res: {IMG_CELL_RES_PX}px, cell: {(cell_pos_from_mouse.x, cell_pos_from_mouse.y)}, sel dim: {char_img_dim}')
 
     ###################################
     # Process the inputs
@@ -273,10 +257,20 @@ while True:
             # Please specify where to save the json file with the dictionary
             if font_dict:
                 print('Saving resulting dict to file...')
+                output = dict()
+                # Add reference to the font img
+                output['font_image'] = FONT_IMG
+                
+                # Add the colorkey
+                output['colorkey'] = f"#{colorkey.r:02X}{colorkey.g:02X}{colorkey.b:02X}"
+
+                # Add the chars
+                output['chars'] = font_dict
+
                 # Save dictionary to JSON file
                 import json
                 with open(FONT_JSON, 'w') as json_file:
-                    json.dump(font_dict, json_file, indent=4)  # indent=4 to format the output nicely
+                    json.dump(output, json_file, indent=4)  # indent=4 to format the output nicely
             
             pygame.quit()
             quit()
@@ -318,24 +312,14 @@ while True:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1: # LEFT MOUSE BUTTON
-                print(f'Screen Cursor Pos TopLeft: {(screen_topleft_cell_pos_from_mouse_px.x, screen_topleft_cell_pos_from_mouse_px.y)}')
-                print(f'BotomRight: {(screen_topleft_cell_pos_from_mouse_px.x + screen_cell_res_px.x, screen_topleft_cell_pos_from_mouse_px.y + screen_cell_res_px.y)}')
-                
-                #img_char_coords_cell_x, img_char_coords_cell_y = int(mouse.x // screen_cell_res_px.x), int(mouse.y // screen_cell_res_px.y)
-                #img_char_coords_px_x, img_char_coords_px_y = screen_cell_res_px.x*IMG_CELL_RES_PX, screen_cell_res_px.y*IMG_CELL_RES_PX
-                print(f'Image Cell Coords: {cell_pos_from_mouse}')
-                print(f'Image Cell Px Pos TopLeft: {(img_topleft_cell_pos_from_cell_px.x, img_topleft_cell_pos_from_cell_px.y)}')
-                print(f'Image Cell Px Pos BotomRight: {(img_bottomright_cell_pos_from_cell_px.x, img_bottomright_cell_pos_from_cell_px.y)}')
-
-                # Snap the character image
-                #char_img = clip(font_img, img_topleft_cell_pos_from_cell_px, (IMG_CELL_RES_PX, IMG_CELL_RES_PX))
-                #print(f'Char image: {char_img}')
-
-                # Reset the selection and remember the selection start point
-                #selection = set()
+                #print(f'Screen Cursor Pos TopLeft: {(screen_topleft_cell_pos_from_mouse_px.x, screen_topleft_cell_pos_from_mouse_px.y)}')
+                #print(f'BotomRight: {(screen_topleft_cell_pos_from_mouse_px.x + screen_cell_res_px.x, screen_topleft_cell_pos_from_mouse_px.y + screen_cell_res_px.y)}')
+                #print(f'Image Cell Coords: {cell_pos_from_mouse}')
+                #print(f'Image Cell Px Pos TopLeft: {char_img_dim.topleft}')
+                #print(f'Image Cell Px Pos BotomRight: {char_img_dim.bottomright}')
                 is_selection = not is_selection
+                print(f'Selection: {is_selection}')
                 if is_selection == True: sel_start_cell = cell_pos_from_mouse
-                #selection.add(selection_start_cell)
 
         if event.type == pygame.MOUSEBUTTONUP: 
            pass
@@ -364,8 +348,41 @@ while True:
             
             # After pressing the INSERT button
             if event.key == pygame.K_INSERT:
+
                 # Here save the image to key
-                print(f'Here saving the selected image in the future{char_img}')
+                print(f'Press the button under which the character will be saved...')
+                
+                #char_entered = False
+                key_entered: bool = False
+                key: str = ''
+                
+                while not key_entered: #char_entered:
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN: 
+                            if event.key == pygame.K_RETURN and key: # non empty key is mandatory
+                                # Save the string
+                                font_dict[key] = {
+                                            'width': char_img_dim.width, #selection_cell_length.x * img_cell_res_px,
+                                            'height': char_img_dim.height, #selection_cell_length.y * img_cell_res_px,
+                                            'x': char_img_dim.x, #selection_img_topleft_px.x, # x-coord of the topleft corner in the original file
+                                            'y': char_img_dim.y #selection_img_topleft_px.y # y-coord of the topleft corner in the original file
+                                        }
+                                print(f"Saved under key={key}, {font_dict[key]}, {font_dict=}")
+                                key_entered = True
+
+                                # Save the cells as already used
+                                if is_selection:
+                                    for i in range (min(sel_start_cell.x, sel_finish_cell.x), max(sel_start_cell.x, sel_finish_cell.x)+1):
+                                        for j in range (min(sel_start_cell.y, sel_finish_cell.y), max(sel_start_cell.y, sel_finish_cell.y)+1):
+                                            saved.add(Vect(i,j))
+                                else:
+                                    saved.add(cell_pos_from_mouse)
+
+                            else:
+                                char = event.unicode
+                                if char: # Is printable, save it 
+                                    key = key + char
+                                    print(f'Key: {key=}')
 
             # Navigate using arrow keys
             elif event.key == pygame.K_LEFT: pygame.mouse.set_pos((max(0, mouse.x - screen_cell_res_px.x), mouse.y))
@@ -387,56 +404,12 @@ while True:
             elif event.key == pygame.K_F1:
                 show_help = not show_help
 
-            #elif event.key == pygame.K_RETURN:
-            #    dict_key = input(f"Return pressed. Under what key do you want to save {char_img}?")
-            #    print(f"Dict_key: {dict_key=}")
-            #    if dict_key:
-            #        for c in dict_key: # Save the same info for all characters in the input string - for example, create 2 records for As input dict_key
-            #            font_dict[c] = {
-            #                'width': selection_cell_length.x * IMG_CELL_RES_PX,
-            #                'height': selection_cell_length.y * IMG_CELL_RES_PX,
-            #                'x': selection_img_topleft_px.x, # x-coord of the topleft corner in the original file
-            #                'y': selection_img_topleft_px.y # y-coord of the topleft corner in the original file
-            #            }
-            #            print(f'Added to dictionary: {font_dict[c]}.')
-            #        print(f'Font dict: {font_dict}.')
-            #        # Mark graphically as saved
-            #        saved = saved.union(selection)
-            #        print(f'Selected cells: {selection}, Already saved cells: {saved}')
 
-
-    # Process area selection of cells
+    # Selection in progress
     mouse_buttons = pygame.mouse.get_pressed()
 
     if mouse_buttons[0] == 1: # left button is pressed
-        # Selection in progress
         sel_finish_cell = cell_pos_from_mouse
 
-        # Take min on x and count to max on x
-        #for i in range (min(sel_start_cell.x, sel_finish_cell.x), max(sel_start_cell.x, sel_finish_cell.x)+1):
-        #    for j in range (min(sel_start_cell.y, sel_finish_cell.y), max(sel_start_cell.y, sel_finish_cell.y)+1):
-        #        selected_cell = Vect(i,j)
-        #        # add to selection
-        #        selection.add(selected_cell)
-        #        # blit
-        #        screen_topleft_cell_pos_from_cell_px = get_screen_topleft_cell_pos_from_cell_px(selected_cell, screen_cell_res_px)
-        #        screen.blit(cell_sel_rect_surface, (screen_topleft_cell_pos_from_cell_px.x, screen_topleft_cell_pos_from_cell_px.y))
-
-    # Show saved cells
-    for s in saved:
-        screen_topleft_cell_pos_from_cell_px = get_screen_topleft_cell_pos_from_cell_px(s, screen_cell_res_px)
-        screen.blit(cell_save_rect_surface, (screen_topleft_cell_pos_from_cell_px.x, screen_topleft_cell_pos_from_cell_px.y))
-
-
-    # left button not pressed
-    #else:
-    #    # Show saved cells
-    #    for s in saved:
-    #        screen_topleft_cell_pos_from_cell_px = get_screen_topleft_cell_pos_from_cell_px(s, screen_cell_res_px)
-    #        screen.blit(cell_save_rect_surface, (screen_topleft_cell_pos_from_cell_px.x, screen_topleft_cell_pos_from_cell_px.y))
-
-
-    # Show help
-    if show_help: screen.blit(help_text_surf, (0, 0))  # Position the text at (250, 250)
 
     pygame.display.update()

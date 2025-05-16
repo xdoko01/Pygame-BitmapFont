@@ -8,7 +8,7 @@ import sys, pathlib
 
 pygame.init()
 pygame.display.set_caption('BitmapFont Demo - close the window for exit')
-screen = pygame.display.set_mode((500, 500), pygame.SRCALPHA)
+screen = pygame.display.set_mode((800, 800))
 
 # Where to find the JSON fonts
 FONT_PATH = pathlib.Path('fonts')
@@ -33,6 +33,12 @@ my_first_fixed_font = BitmapFontFreeDims(path=FONT_PATH / 'charset_id1.json')
 
 # And another
 my_second_fixed_font = BitmapFontFreeDims(path=FONT_PATH / 'simple.json')
+
+# And another
+my_third_fixed_font = BitmapFontFreeDims(path=FONT_PATH / 'charset_id5.json')
+
+# And another
+my_fourth_fixed_font = BitmapFontFreeDims(path=FONT_PATH / 'charset_moon1.json')
 
 while True:
 
@@ -59,9 +65,9 @@ while True:
 
     # Quake 1 font
     screen.blit(my_first_fixed_font.render(f'Quake font\nIs the greatest\nanyways! + centered', align='CENTER')[0], (50, 150))
-
-    screen.blit(my_second_fixed_font.render(f'Quake 2 font\nIs the greatest\nanyways!', align='LEFT')[0], (0, 0))
-
+    screen.blit(my_second_fixed_font.render(f'Quake 2 font Is the greatest anyways!', align='LEFT')[0], (0, 0))
+    screen.blit(my_third_fixed_font.render(f'Quake 3 font Is the greatest anyways!', align='LEFT')[0], (0, 30))
+    screen.blit(my_fourth_fixed_font.render(f'Quake 4 font\nIs the greatest\nanyways!', align='CENTER')[0], (0, 500))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
