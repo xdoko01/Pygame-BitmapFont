@@ -3,7 +3,7 @@
 ########################################################
 
 import pygame # for game window
-from bitmap_font import BitmapFontFixedHeight, BitmapFontFreeDims # for bitmap font usage
+from bitmapfont import BitmapFontFixedHeight, BitmapFontFreeDims # for bitmap font usage
 import sys, pathlib
 
 pygame.init()
