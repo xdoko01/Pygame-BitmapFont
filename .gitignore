@@ -6,9 +6,3 @@ __pycache__
 
 # Ignore all backup directories
 **/backup
-
-# Do not include fonts into the package
-**/fonts
-
-# Do not include extractor tools into the package
-**/tools

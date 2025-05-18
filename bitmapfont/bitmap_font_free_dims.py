@@ -40,10 +40,10 @@
         ...
 '''
 import pygame
-from . import BitmapFont
-from .utils import load_font_data_from_file, load_font_image
+from . import BitmapFontProtocol, load_font_data_from_file, load_font_image
+#from .utils import load_font_data_from_file, load_font_image
 
-class BitmapFontFreeDims(BitmapFont):
+class BitmapFontFreeDims(BitmapFontProtocol):
     '''Implementation of bitmap font using reference to the texture with characters in bitmap file and 
     json file specifiing position and dimension of individual font characters.
     '''

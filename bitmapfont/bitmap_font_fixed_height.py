@@ -38,10 +38,10 @@
         }
 '''
 import pygame
-from . import BitmapFont
-from .utils import load_font_data_from_file, load_font_image, color_swap
+from . import BitmapFontProtocol, load_font_data_from_file, load_font_image, color_swap
+#from .utils import load_font_data_from_file, load_font_image, color_swap
 
-class BitmapFontFixedHeight(BitmapFont):
+class BitmapFontFixedHeight(BitmapFontProtocol):
     ''' Class containing character font pictures and necessary information.
     '''
 

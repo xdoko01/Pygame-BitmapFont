@@ -1,0 +1,20 @@
+[project]
+name = "bitmapfont"
+version = "0.1.0"
+description = "A Python library to render text from bitmap font images"
+authors = [
+    { name = "xdoko01" }
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.7"
+dependencies = [
+    "pygame>=2.0.0"
+]
+
+[project.scripts]
+bitmapfont-extract = "bitmapfont.extractor:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

@@ -18,21 +18,13 @@
 import pygame
 from typing import Protocol
 
-class BitmapFont(Protocol):
+class BitmapFontProtocol(Protocol):
     """Interface all bitmap fonts must implement"""
     def __init__(self, path: str, size: int):
         pass
 
-    def render(self, text: str) -> pygame.Surface:
+    def render(self, text: str) -> tuple[pygame.Surface, pygame.Rect]:
         pass
-
-########################################################
-### Public Package classes
-########################################################
-__all__ = ['BitmapFontFixedHeight', 'BitmapFontFreeDims']
-
-from .bitmap_font_fixed_height import BitmapFontFixedHeight
-from .bitmap_font_free_dims import BitmapFontFreeDims
 
 ########################################################
 ### Internal Package functions
@@ -94,3 +86,10 @@ def load_font_image(path: str, font_image: str) -> pygame.Surface:
 
     return pygame.image.load(font_image_path).convert()
 
+########################################################
+### Public Package classes
+########################################################
+__all__ = ['BitmapFontFixedHeight', 'BitmapFontFreeDims']
+
+from .bitmap_font_fixed_height import BitmapFontFixedHeight
+from .bitmap_font_free_dims import BitmapFontFreeDims
