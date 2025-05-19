@@ -67,11 +67,14 @@ def load_font_data_from_file(path: str) -> dict:
         with open(path, 'r') as font_file:
             json_font_data = font_file.read()
             font_data = json.loads(re.sub("//.*", "", json_font_data, flags=re.MULTILINE)) # Remove C-style comments before processing JSON
+            return font_data
     except FileNotFoundError:
-        print(f"Bitmap font definition file '{path}' was not found.")
-        raise ValueError
-    
-    return font_data
+        raise FileNotFoundError(f"Bitmap font definition file '{path}' was not found.")
+    except json.JSONDecodeError:
+        raise ValueError(f"Invalid JSON format in font data file: {path}")
+    except Exception as e:
+        raise Exception(f"Error loading font data: {e}")
+
 
 def load_font_image(path: str, font_image: str) -> pygame.Surface:
     """Load the texture image from the file."""
@@ -89,7 +92,25 @@ def load_font_image(path: str, font_image: str) -> pygame.Surface:
 ########################################################
 ### Public Package classes
 ########################################################
-__all__ = ['BitmapFontFixedHeight', 'BitmapFontFreeDims']
+__all__ = ['BitmapFontFixedHeight', 'BitmapFontFreeDims', 'BitmapFont']
 
 from .bitmap_font_fixed_height import BitmapFontFixedHeight
 from .bitmap_font_free_dims import BitmapFontFreeDims
+
+class BitmapFont:
+    """
+    A factory class that automatically detects the bitmap font format
+    and creates an instance of the appropriate font rendering class.
+    """
+    def __new__(cls,  path: str, size: int=None, spacing: tuple[int, int]=(0,0), **kwargs):
+
+        font_data = load_font_data_from_file(path=path)
+
+        if 'character_order' in font_data:
+            instance = super().__new__(BitmapFontFixedHeight)
+            instance.__init__(path=path, size=size, spacing=spacing, color=kwargs.get('color'))
+            return instance
+        else:
+            instance = super().__new__(BitmapFontFreeDims)
+            instance.__init__(path=path, size=size, spacing=spacing)
+            return instance
