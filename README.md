@@ -101,6 +101,10 @@ Tips
  - once saved, the cell is grey
 
 ## TODOs
+ - [ ] PyPI package
+ - [ ]mention on pygame page
+ - [ ] Add more credit files
  - [ ] More test cases
   - [ ] FreeDim font having different heights of characters
   - [ ] Usage of default colorkey
+  - [ ] Adding spaces vertical/horizontal

@@ -1,5 +1,5 @@
 [project]
-name = "bitmapfont"
+name = "pgbitmapfont"
 version = "0.1.0"
 description = "A Python library to render text from bitmap font images"
 authors = [
@@ -14,6 +14,10 @@ dependencies = [
 
 [project.scripts]
 bitmapfont-extract = "bitmapfont.extractor:main"
+
+[project.urls]
+Homepage = "https://github.com/xdoko01/Pygame-BitmapFont"
+Issues = "https://github.com/xdoko01/Pygame-BitmapFont/issues"
 
 [build-system]
 requires = ["setuptools>=61.0"]
