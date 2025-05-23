@@ -4,12 +4,12 @@ import os
 from pathlib import Path
 
 # Assuming your library will be installable, you'd import it like this:
-from pgbitmapfont import BitmapFont
+#from pgbitmapfont import BitmapFont
 
 # If running directly from the repo for testing, you might need to adjust sys.path:
-#import sys
-#sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-#from pgbitmapfont import BitmapFont # Or from bitmapfont.bitmapfont import BitmapFont
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from pgbitmapfont import BitmapFont # Or from bitmapfont.bitmapfont import BitmapFont
 
 # Path to your test font fixtures
 TEST_FONT_DIR = Path(os.path.join(os.path.dirname(__file__), 'fonts'))
