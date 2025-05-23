@@ -1,14 +1,3 @@
- # TODOs
-
- - [ ] Experiment with pipelines in GitHub
- - [x] Finetune the extractor tool
- - [x] Prepare README.md
- - [x] Fix the test suite
- - [x] Prepare the test suite 
- - [x] Must support generation even if character does not exist. First character in the fixed height and default in the Free Dims
-   - [x] FixedHeight font
-   - [x] FreeDims font
-
 # Pygame-BitmapFont
 
 A lightweight and easy-to-use library for rendering bitmap fonts in Pygame.
