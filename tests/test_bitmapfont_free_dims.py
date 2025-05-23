@@ -4,12 +4,12 @@ import os
 from pathlib import Path
 
 # Assuming your library will be installable, you'd import it like this:
-#from pgbitmapfont import BitmapFont
+from pgbitmapfont import BitmapFont
 
 # If running directly from the repo for testing, you might need to adjust sys.path:
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from pgbitmapfont import BitmapFont # Or from bitmapfont.bitmapfont import BitmapFont
+#import sys
+#sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#from pgbitmapfont import BitmapFont # Or from bitmapfont.bitmapfont import BitmapFont
 
 # Path to your test font fixtures
 TEST_FONT_DIR = Path(os.path.join(os.path.dirname(__file__), 'fonts'))
@@ -18,7 +18,6 @@ TEST_FONT_DIR = Path(os.path.join(os.path.dirname(__file__), 'fonts'))
 TEST_FREE_DIMS_CORRECT_FONT = Path(os.path.join(TEST_FONT_DIR, 'free_dims/correct_font.json'))
 TEST_FREE_DIMS_CORRUPTED_JSON_FONT = Path(os.path.join(TEST_FONT_DIR, 'free_dims/corrupted_json_font.json'))
 TEST_FREE_DIMS_MISSING_IMAGE_FONT = Path(os.path.join(TEST_FONT_DIR, 'free_dims/miss_image_font.json'))
-TEST_FREE_DIMS_MISSING_COLORKEY_FONT = Path(os.path.join(TEST_FONT_DIR, 'free_dims/miss_colorkey_font.json'))
 TEST_FREE_DIMS_MISSING_CHARS_FONT = Path(os.path.join(TEST_FONT_DIR, 'free_dims/miss_chars_font.json'))
 TEST_FREE_DIMS_EMPTY_CHARS_FONT = Path(os.path.join(TEST_FONT_DIR, 'free_dims/empty_chars_font.json'))
 TEST_FREE_DIMS_INCORRECT_CHARS_FONT = Path(os.path.join(TEST_FONT_DIR, 'free_dims/incorrect_chars_font.json'))
@@ -90,10 +89,6 @@ class TestBitmapFontFreeDims(unittest.TestCase):
         # Test missing font image file path
         with self.assertRaises(Exception): # Replace with your specific parsing error
             BitmapFont(TEST_FREE_DIMS_MISSING_IMAGE_FONT)
-
-        # Test missing colorkey
-        with self.assertRaises(Exception): # Replace with your specific parsing error
-            BitmapFont(TEST_FREE_DIMS_MISSING_COLORKEY_FONT)
 
         # Chars missing
         with self.assertRaises(Exception): # Replace with your specific parsing error

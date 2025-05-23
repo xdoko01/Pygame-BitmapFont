@@ -4,12 +4,12 @@ import os
 from pathlib import Path
 
 # Assuming your library will be installable, you'd import it like this:
-#from pgbitmapfont import BitmapFont
+from pgbitmapfont import BitmapFont
 
 # If running directly from the repo for testing, you might need to adjust sys.path:
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from pgbitmapfont import BitmapFont # Or from bitmapfont.bitmapfont import BitmapFont
+#import sys
+#sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#from pgbitmapfont import BitmapFont # Or from bitmapfont.bitmapfont import BitmapFont
 
 # Path to your test font fixtures
 TEST_FONT_DIR = Path(os.path.join(os.path.dirname(__file__), 'fonts'))
@@ -165,6 +165,7 @@ class TestBitmapFontFixedHeight(unittest.TestCase):
         underscore_char = self.correct_font.render(text='_')
         a_character_char = self.correct_font.render(text='A')
         # The resulting with should be the sum of widths taking into account the spacing
+        #print(f'{self.correct_font.default_char=} > {rendered_text[1].width=} = 2*{2*a_character_char[1].width=} + 2* {self.correct_font.spacing[0]=} + {underscore_char[1].width=}')
         self.assertEqual(rendered_text[1].width, 2*a_character_char[1].width + 2*self.correct_font.spacing[0] + underscore_char[1].width)
 
 

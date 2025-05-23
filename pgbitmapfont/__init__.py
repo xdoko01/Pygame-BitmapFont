@@ -102,15 +102,15 @@ class BitmapFont:
     A factory class that automatically detects the bitmap font format
     and creates an instance of the appropriate font rendering class.
     """
-    def __new__(cls,  path: str, size: int=None, spacing: tuple[int, int]=(0,0), **kwargs):
+    def __new__(cls,  path: str, size: int=None, spacing: tuple[int, int]=(0,0), default_char: str='_', **kwargs):
 
         font_data = load_font_data_from_file(path=path)
 
         if 'character_order' in font_data:
             instance = super().__new__(BitmapFontFixedHeight)
-            instance.__init__(path=path, size=size, spacing=spacing, color=kwargs.get('color'), default_char=kwargs.get('default_char'))
+            instance.__init__(path=path, size=size, spacing=spacing, color=kwargs.get('color'), default_char=default_char)
             return instance
         else:
             instance = super().__new__(BitmapFontFreeDims)
-            instance.__init__(path=path, size=size, spacing=spacing, default_char=kwargs.get('default_char'))
+            instance.__init__(path=path, size=size, spacing=spacing, default_char=default_char)
             return instance

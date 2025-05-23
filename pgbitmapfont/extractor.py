@@ -1,19 +1,7 @@
 ########################################################
 ### Extractor - prepare font in the suitable format
-###  - take fixed font picture
-###    - enter parameters of the whole charset and one character
-###  - define which characters to extract
-###    - define from - to range or list of tuples to generate
-###    - [('Aa', (5,5))]
-###  - define the background color and separator
-###  - construct the new picture with font and the json descriptive file
-###  - alternative descriptive json creation
-###    {
-###         'A': {x: 150, y:150, dx:16, dy:16},
-###         'a': {x: 150, y:150, dx:16, dy:16}
-###    }
-###
-###    TODO: Tab button will go through the grit from top left to bottom down
+### 
+### bitmapfont-extract --img font_image.png --out font.json
 ########################################################
 import pygame
 from dataclasses import dataclass
@@ -69,13 +57,13 @@ def get_char_img_from_cell_selection(font_img: pygame.Surface, img_cell_res_px: 
 # Create an ArgumentParser object for processing the input
 import argparse
 parser = argparse.ArgumentParser(description="Process command-line arguments.")
-parser.add_argument("--img", type=str, help="Image with font characters", required=False) 
+parser.add_argument("--img", type=str, help="Image with font characters", required=True) 
 parser.add_argument("--out", type=str, help="Output JSON file", required=False)
 args = parser.parse_args()
 
 # Get from input line
-FONT_IMG = args.img if args.img else 'fonts/charset_moon1.png'
-FONT_JSON = args.out if args.out else FONT_IMG.split('/')[-1].split('.')[0] + '.jsonx'
+FONT_IMG = args.img #if args.img else 'fonts/charset_moon1.png'
+FONT_JSON = args.out if args.out else FONT_IMG.split('/')[-1].split('.')[0] + '.json'
 IMG_CELL_RES_PX = 16 # resolution of the grid cell on the original image
 COLORKEY_PIXEL_LOCATION = (0,0)
 
@@ -92,7 +80,8 @@ HELP_TEXT = \
 '''Help
 1. Select the suitable grid resolution by 'PgUp', 'PgDown'
 2. Select the cell with texture by mouse and/or cursor keys
-3. Press INSERT to save the texture details into JSON
+3. Press INSERT and enter the character under which it will be stored.
+4. Once done, press RETURN to save and continue.
 Tips
  - once saved, the cell is grey
 Enjoy!

@@ -13,7 +13,7 @@ import pygame # for game window
 import pathlib
 
 pygame.init()
-pygame.display.set_caption('BitmapFont Demo - close the window for exit')
+pygame.display.set_caption('Pygame-BitmapFont Demo - close the window for exit')
 screen = pygame.display.set_mode((800, 800))
 
 # Where to find the JSON fonts
