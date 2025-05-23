@@ -2,6 +2,8 @@
 
 A lightweight and easy-to-use library for rendering bitmap fonts in Pygame.
 
+![extractor.png](demo.png "Extractor tool")
+
 ## Overview
 
 Pygame-BitmapFont provides a simple way to load and render text using pre-rendered bitmap font images and associated font data files. This approach is often preferred in game development for its performance and consistent look across different platforms.
@@ -84,6 +86,8 @@ pygame.quit()
 
 ## Usage of `bitmapfont-extract` tool
 
+![extractor.png](extractor.png "Extractor tool")
+
 Once the Pygame-BitmapFont (pgbitmapfont) package is installed via `pip`, you can use the following command to run the bitmapfont-extract tool:
 
 ```bash
@@ -101,9 +105,7 @@ Tips
  - once saved, the cell is grey
 
 ## TODOs
- - [ ] PyPI package
- - [ ]mention on pygame page
- - [ ] Add more credit files
+ 
  - [ ] More test cases
   - [ ] FreeDim font having different heights of characters
   - [ ] Usage of default colorkey

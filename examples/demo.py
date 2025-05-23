@@ -22,9 +22,9 @@ FONT_PATH = pathlib.Path('examples/fonts')
 # Fixed Height formats fonts examples
 my_first_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json', color=pygame.Color('grey'))
 my_second_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json',  size=16)
-my_third_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json', size=16, color=pygame.Color('purple'))
-my_fourth_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'red_gradient_capital_font.json', size=16)
-my_fifth_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'good_neighbours_font.json', size=32, color=pygame.Color('blue'))
+my_third_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json', size=8, color=pygame.Color('brown'))
+my_fourth_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'red_gradient_capital_font.json', size=16, spacing=(2,5))
+my_fifth_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'good_neighbours_font.json', size=32, color=pygame.Color('orange'))
 
 # Free Dimension fonts examples
 my_first_free_dims_font = BitmapFontFreeDims(path=FONT_PATH / 'charset_id1.json')
@@ -32,8 +32,8 @@ my_second_free_dims_font = BitmapFontFreeDims(path=FONT_PATH / 'simple.json')
 my_third_free_dims_font = BitmapFontFreeDims(path=FONT_PATH / 'charset_id5.json')
 my_fourth_free_dims_font = BitmapFontFreeDims(path=FONT_PATH / 'charset_moon1.json')
 
-bm_font1 = BitmapFont(path=FONT_PATH / 'small_font.json', color=pygame.Color('red'), size=32, spacing=(1,1), default_char=None)
-bm_font2 = BitmapFont(path=FONT_PATH / 'charset_id1.json', color=pygame.Color('red'), size=64)
+bm_font1 = BitmapFont(path=FONT_PATH / 'small_font.json', color=pygame.Color('green'), size=32, spacing=(1,1))
+bm_font2 = BitmapFont(path=FONT_PATH / 'charset_id1.json', color=pygame.Color(128,128,0), size=40)
 
 
 while True:
@@ -42,32 +42,29 @@ while True:
     screen.fill((128, 128, 128))
 
     #BitmapFonts - created by Factory BitmapFont class
-    bm_font1_text = bm_font1.render(f'FixšHeightýtext, FixčHeight text, FixšHeight text, Fix Height text,')
-    screen.blit(bm_font1_text[0], (70, 70))
-    pygame.draw.rect(screen, (255,0,0), pygame.Rect(70,70,bm_font1_text[1].width, bm_font1_text[1].height), width=1)
-
-    screen.blit(bm_font2.render(f'Free Dim text,\n Free Dim text,\n Free Dim text,', align='CENTER')[0], (470, 500))
+    screen.blit(bm_font1.render(f'bm_font1\nsized to 32px\naligned right', align='RIGHT')[0], (570, 370))
+    screen.blit(bm_font2.render(f'bm_font2\nsized to 64px\naligned to center', align='CENTER')[0], (10, 650))
     
     # Third render method - blit manually multiple lines, alignment left
-    screen.blit(my_third_fixed_height_font.render(f'Render text\nthat is rendered\nonto multiple\nlines + left.')[0], (60, 60))
+    screen.blit(my_third_fixed_height_font.render(f'Render text\nthat is rendered\nonto multiple\nlines + left.')[0], (410, 160))
 
     # Third render method - blit manually multiple lines, alignment right
-    screen.blit(my_third_fixed_height_font.render(f'Render text\nthat is rendered\nonto multiple\nlines + right.', align='RIGHT')[0], (260, 60))
+    screen.blit(my_third_fixed_height_font.render(f'Render text\nthat is rendered\nonto multiple\nlines + right.', align='RIGHT')[0], (710, 160))
 
     # Third render method - blit manually multiple lines, alignment center
-    screen.blit(my_third_fixed_height_font.render(f'Render text\nthat is rendered\nonto multiple\nlines + changed color and centered.', pygame.Color('#010101'), align='CENTER')[0], (260, 260))
+    screen.blit(my_third_fixed_height_font.render(f'Render text\nthat is rendered\nonto multiple\nlines + changed color and centered.', pygame.Color('#010101'), align='CENTER')[0], (510, 160))
 
     # Gradient font
-    screen.blit(my_fourth_fixed_height_font.render(f'Render text\nthat is rendered\nonto multiple\nlines changed color and centered'.upper(), pygame.Color('#010101'), align='CENTER')[0], (160, 260))
+    screen.blit(my_fourth_fixed_height_font.render(f'Render text\nthat is rendered\nonto multiple\nlines changed color and centered'.upper(), pygame.Color('#010101'), align='CENTER')[0], (420, 260))
 
     # Good Neighbours font
-    screen.blit(my_fifth_fixed_height_font.render(f'Render text\nthat is rendered\nonto multiple\nlines + centered.', align='CENTER')[0], (60, 260))
+    screen.blit(my_fifth_fixed_height_font.render(f'Render text\nthat is rendered\nonto multiple\nlines + centered.', align='CENTER')[0], (20, 300))
 
     # Quake fonts
     screen.blit(my_first_free_dims_font.render(f'Quake font\nIs the greatest\nanyways! + centered', align='CENTER')[0], (50, 150))
-    screen.blit(my_second_free_dims_font.render(f'Quake 2 font Is the greatest anyways!', align='LEFT')[0], (0, 0))
-    screen.blit(my_third_free_dims_font.render(f'Quake 3 font Is the greatest anyways!', align='LEFT')[0], (0, 30))
-    screen.blit(my_fourth_free_dims_font.render(f'Quake 4 font\nIs the greatest\nanyways!', align='CENTER')[0], (0, 500))
+    screen.blit(my_second_free_dims_font.render(f'Quake 2 font Is the greatest anyways!', align='LEFT')[0], (10, 10))
+    screen.blit(my_third_free_dims_font.render(f'Quake 3 font Is the greatest anyways!', align='LEFT')[0], (10, 30))
+    screen.blit(my_fourth_free_dims_font.render(f'Quake 4 font\nIs the greatest\nanyways!', align='CENTER')[0], (10, 500))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
