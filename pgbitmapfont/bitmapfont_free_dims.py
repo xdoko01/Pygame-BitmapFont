@@ -41,16 +41,15 @@
 '''
 import pygame
 from . import BitmapFontProtocol, load_font_data_from_file, load_font_image
-#from .utils import load_font_data_from_file, load_font_image
 
 class BitmapFontFreeDims(BitmapFontProtocol):
     '''Implementation of bitmap font using reference to the texture with characters in bitmap file and 
     json file specifiing position and dimension of individual font characters.
     '''
 
-    __slots__ = ['font_height', 'font_img', 'colorkey', 'spacing', 'characters']
+    __slots__ = ['font_height', 'font_img', 'colorkey', 'spacing', 'characters', 'default_char']
 
-    def __init__(self, path: str, size: int=None, spacing: tuple[int, int]=(0,0)):
+    def __init__(self, path: str, size: int=None, spacing: tuple[int, int]=(0,0), default_char: str='_'):
         ''' Prepare bitmap font from predefined path in given size and color.
 
         Parameters:
@@ -62,6 +61,9 @@ class BitmapFontFreeDims(BitmapFontProtocol):
 
             :param spacing: Horizontal and vertical space between the characters in px.
             :type spacing: tuple[int, int]
+
+            :param default_char: Character to be used for the character not present in the font.
+            :type default_char: str (char)
 
             :raise: ValueError - in case there is a problem with font initiation
         '''
@@ -99,6 +101,9 @@ class BitmapFontFreeDims(BitmapFontProtocol):
             self.characters[char]['width'] = int(char_info['width'] * scale)
             self.characters[char]['height'] = int(char_info['height'] * scale)
 
+        # Default_char is not defined in the font file, use the first font character instead
+        self.default_char = default_char if default_char in self.characters else next(iter(self.characters))
+
         # Scale also the font image
         self.font_img = pygame.transform.scale(self.font_img, (int(self.font_img.get_width() * scale), int(self.font_img.get_height() * scale)))
 
@@ -114,10 +119,19 @@ class BitmapFontFreeDims(BitmapFontProtocol):
         '''
         return self.font_height
 
+    def _substitute_unsuported_chars(self, text: str) -> str:
+        '''Cleans the text from characters that are not supported
+        by the font and substitutes them with the default character.
+        '''
+        return ''.join(list(map(lambda c: c if c in self.characters else self.default_char, text)))
+
     def _render_row(self, text: str) -> pygame.Surface:
         ''' Returns surface containing text in a row.
         It is used internally to render the final wrapped text surface
         '''
+
+        # Clear the text from not covered characters
+        text = self._substitute_unsuported_chars(text)
 
         # Prepare empty surface
         row_surf = pygame.Surface((self._get_text_width(text), self._get_text_height(text)))
@@ -197,6 +211,6 @@ class BitmapFontFreeDims(BitmapFontProtocol):
         # Must set colorkey otherwise background will not be transparent
         final_surface.set_colorkey(self.colorkey)
 
-        return (final_surface, pygame.Rect(width=max_width, height=height))
+        return (final_surface, pygame.Rect(0, 0, max_width, height))
 
 

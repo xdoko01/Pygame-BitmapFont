@@ -94,8 +94,8 @@ def load_font_image(path: str, font_image: str) -> pygame.Surface:
 ########################################################
 __all__ = ['BitmapFontFixedHeight', 'BitmapFontFreeDims', 'BitmapFont']
 
-from .bitmap_font_fixed_height import BitmapFontFixedHeight
-from .bitmap_font_free_dims import BitmapFontFreeDims
+from .bitmapfont_fixed_height import BitmapFontFixedHeight
+from .bitmapfont_free_dims import BitmapFontFreeDims
 
 class BitmapFont:
     """
@@ -108,9 +108,9 @@ class BitmapFont:
 
         if 'character_order' in font_data:
             instance = super().__new__(BitmapFontFixedHeight)
-            instance.__init__(path=path, size=size, spacing=spacing, color=kwargs.get('color'))
+            instance.__init__(path=path, size=size, spacing=spacing, color=kwargs.get('color'), default_char=kwargs.get('default_char'))
             return instance
         else:
             instance = super().__new__(BitmapFontFreeDims)
-            instance.__init__(path=path, size=size, spacing=spacing)
+            instance.__init__(path=path, size=size, spacing=spacing, default_char=kwargs.get('default_char'))
             return instance

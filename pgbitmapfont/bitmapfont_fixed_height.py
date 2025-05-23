@@ -39,15 +39,14 @@
 '''
 import pygame
 from . import BitmapFontProtocol, load_font_data_from_file, load_font_image, color_swap
-#from .utils import load_font_data_from_file, load_font_image, color_swap
 
 class BitmapFontFixedHeight(BitmapFontProtocol):
     ''' Class containing character font pictures and necessary information.
     '''
 
-    __slots__ = ['font_height', 'font_img', 'font_color', 'colorkey', 'spacing', 'characters']
+    __slots__ = ['font_height', 'font_img', 'font_color', 'colorkey', 'spacing', 'characters', 'default_char']
 
-    def __init__(self, path: str, size: int=None, color: pygame.Color=None, spacing: tuple[int, int]=(1,1)):
+    def __init__(self, path: str, size: int=None, color: pygame.Color=None, spacing: tuple[int, int]=(1,1), default_char: str='_'):
         ''' Prepare bitmap font from predefined path in given size and color.
 
         Parameters:
@@ -63,17 +62,31 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
             :param spacing: Horizontal and vertical space between the characters in px.
             :type spacing: tuple[int, int]
 
+            :param default_char: Character to be used for the character not present in the font.
+            :type default_char: str (char)
+
             :raise: ValueError - in case there is a problem with font initiation
         '''
+
+        # How many pixels of space between characters
+        self.spacing = spacing
 
         # Get font data from the file
         font_data = load_font_data_from_file(path=path)
 
         # Get font image based on the font data
-        self.font_img = load_font_image(path=path, font_image=font_data['font_image'])
+        try:
+            assert 'font_image' in font_data, f"Missing 'font_image' key."
+            self.font_img = load_font_image(path=path, font_image=font_data['font_image'])
+        except AssertionError:
+            raise ValueError
 
         # Set color
-        self.font_color = pygame.Color(font_data.get('font_color'))
+        try:
+            assert ('font_color' in font_data and color) or not color, f"Missing 'font_color' key."
+            self.font_color = pygame.Color(font_data.get('font_color'))
+        except AssertionError:
+            raise ValueError
 
         # Set colorkey to correctly prepare the transparent parts of the font image
         try:
@@ -81,12 +94,9 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
             assert self.font_color != self.colorkey, 'Color cannot be the same as the color key'
         except AssertionError:
             raise ValueError
-        
+
         # Set colorkey of the image - for proper transparency
         self.font_img.set_colorkey(self.colorkey)
-
-        # How many pixels of space between characters
-        self.spacing = spacing
 
         # Store the original font height
         font_height = self.font_img.get_height()
@@ -102,10 +112,20 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
         #####
 
         # Get the color that is separating the individual characters in the char image
-        separator_color = pygame.Color(font_data.get('separator_color'))
+        try:
+            assert 'separator_color' in font_data, f"Missing 'separator_color' key."
+            separator_color = pygame.Color(font_data.get('separator_color'))
+        except AssertionError:
+            raise ValueError
 
         # List of characters included in the font file in the correct order
-        character_order = font_data.get('character_order')
+        try:
+            assert 'character_order' in font_data, f"Missing 'character_order' key."
+            assert isinstance(font_data['character_order'], list) == True, f"'character_order' value must be a list."
+            assert len(font_data['character_order']) > 1, f"'character_order' must not be empty list."
+            character_order = font_data.get('character_order')
+        except AssertionError:
+            raise ValueError
 
         # Store the char img coordinates and dimensions in the original img file
         self.characters = dict()
@@ -135,6 +155,9 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
             else:
                 current_char_width += 1 # count aditional pixel for char width
 
+        # Default_char is not defined in the font file, use the first font character instead
+        self.default_char = default_char if default_char in self.characters else character_order[0][0]
+
         # Change color if required
         if color is not None:
             self.font_img = color_swap(self.font_img, self.font_color, color)
@@ -142,11 +165,13 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
         # Scale also the font image
         self.font_img = pygame.transform.scale(self.font_img, (int(self.font_img.get_width() * scale), int(self.font_img.get_height() * scale)))
 
+
     def _get_text_width(self, text: str) -> int:
         ''' Returns width in pixels of the given text.
         It is used internally tin render function to determine the final dimensions
         of a font surface.
         '''
+        # Use default_char in case that character is not contained in the font
         return sum([self.characters[char]['width'] for char in text]) + (self.spacing[0] * len(text))
 
     def _get_text_height(self, text: str=None) -> int:
@@ -154,10 +179,19 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
         '''
         return self.font_height
 
+    def _substitute_unsuported_chars(self, text: str) -> str:
+        '''Cleans the text from characters that are not supported
+        by the font and substitutes them with the default character.
+        '''
+        return ''.join(list(map(lambda c: c if c in self.characters else self.default_char, text)))
+
     def _render_row(self, text: str) -> pygame.Surface:
         ''' Returns surface containing text in a row.
         It is used internally to render the final wrapped text surface
         '''
+
+        # Clear the text from not covered characters
+        text = self._substitute_unsuported_chars(text)
 
         # Prepare empty surface
         row_surf = pygame.Surface((self._get_text_width(text), self._get_text_height(text)))
@@ -243,4 +277,4 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
         # Must set colorkey otherwise background will not be transparent
         final_surface.set_colorkey(self.colorkey)
 
-        return (final_surface, pygame.Rect(width=max_width,height=height))
+        return (final_surface, pygame.Rect(0, 0, max_width, height))
