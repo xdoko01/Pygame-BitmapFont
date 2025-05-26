@@ -39,6 +39,7 @@
 '''
 import pygame
 from . import BitmapFontProtocol, load_font_data_from_file, load_font_image, color_swap
+from pathlib import Path
 
 class BitmapFontFixedHeight(BitmapFontProtocol):
     ''' Class containing character font pictures and necessary information.
@@ -46,7 +47,7 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
 
     __slots__ = ['font_height', 'font_img', 'font_color', 'colorkey', 'spacing', 'characters', 'default_char']
 
-    def __init__(self, path: str, size: int=None, color: pygame.Color=None, spacing: tuple[int, int]=(1,1), default_char: str='_'):
+    def __init__(self, path: Path, size: int=None, color: pygame.Color=None, spacing: tuple[int, int]=(1,1), default_char: str='_'):
         ''' Prepare bitmap font from predefined path in given size and color.
 
         Parameters:

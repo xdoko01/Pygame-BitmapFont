@@ -41,6 +41,7 @@
 '''
 import pygame
 from . import BitmapFontProtocol, load_font_data_from_file, load_font_image
+from pathlib import Path
 
 class BitmapFontFreeDims(BitmapFontProtocol):
     '''Implementation of bitmap font using reference to the texture with characters in bitmap file and 
@@ -49,7 +50,7 @@ class BitmapFontFreeDims(BitmapFontProtocol):
 
     __slots__ = ['font_height', 'font_img', 'colorkey', 'spacing', 'characters', 'default_char']
 
-    def __init__(self, path: str, size: int=None, spacing: tuple[int, int]=(0,0), default_char: str='_'):
+    def __init__(self, path: Path, size: int=None, spacing: tuple[int, int]=(0,0), default_char: str='_'):
         ''' Prepare bitmap font from predefined path in given size and color.
 
         Parameters:
