@@ -157,9 +157,19 @@ class BitmapFontFreeDims(BitmapFontProtocol):
         return row_surf
 
     def get_text_dim(self, text: str) -> tuple[int, int]:
-        ''' Return the dimensions of the surface with generated text
+        ''' Return the dimensions of the surface with generated text.
         '''
         return (max([self._get_text_width(row_text) for row_text in text.split('\n')]), (self._get_text_height() + self.spacing[1]) * len(text.split('\n')))
+
+    def get_rect(self, text: str) -> pygame.Rect:
+        ''' Return the dimensions of the surface with generated text as a pygame Rect.
+        '''
+        return pygame.Rect(
+            0,
+            0,
+            max([self._get_text_width(row_text) for row_text in text.split('\n')]), 
+            (self._get_text_height() + self.spacing[1]) * len(text.split('\n'))
+        )
 
     def render(self, text: str, align: str='LEFT') -> tuple[pygame.Surface, pygame.Rect]:
         ''' Renders given text in given color and in given

@@ -23,6 +23,9 @@ class BitmapFontProtocol(Protocol):
     def __init__(self, path: str, size: int):
         pass
 
+    def get_rect(self, text: str) -> pygame.Rect:
+        pass
+
     def render(self, text: str) -> tuple[pygame.Surface, pygame.Rect]:
         pass
 
