@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 # Assuming your library will be installable, you'd import it like this:
-from pgbitmapfont import BitmapFont
+#from pgbitmapfont import BitmapFont
 
 # If running directly from the repo for testing, you might need to adjust sys.path:
 import sys

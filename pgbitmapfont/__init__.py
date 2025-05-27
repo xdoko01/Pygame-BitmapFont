@@ -17,6 +17,8 @@
 ########################################################
 import pygame
 from typing import Protocol
+from pathlib import Path
+
 
 class BitmapFontProtocol(Protocol):
     """Interface all bitmap fonts must implement"""
@@ -32,10 +34,8 @@ class BitmapFontProtocol(Protocol):
 ########################################################
 ### Internal Package functions
 ########################################################
-import pygame # For picture manipulation
 import json # For reading the JSON font definition
 import re # For removing C-style comments before processing JSON
-from pathlib import Path
 
 def clip(surf: pygame.Surface, x: int, y: int, x_size: int, y_size: int) -> pygame.Surface:
     """Get defined surface from the larger surface."""
