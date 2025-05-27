@@ -97,7 +97,7 @@ class TestBitmapFontFixedHeight(unittest.TestCase):
 
         # Missing font_color key in case color is defined
         with self.assertRaises(Exception): # Replace with your specific parsing error
-            BitmapFont(path=TEST_FIXED_HEIGHT_MISSING_COLOR_FONT, color=(255,255,0))
+            BitmapFont(path=TEST_FIXED_HEIGHT_MISSING_COLOR_FONT, fgcolor=(255,255,0))
 
         # Color and colorkey in the file are the same - error
         with self.assertRaises(Exception): # Replace with your specific parsing error
@@ -128,7 +128,7 @@ class TestBitmapFontFixedHeight(unittest.TestCase):
         # Clear surface
         self.test_surface.fill((0,0,0))
         # Render
-        rendered_text = self.correct_font.render(text="Ahoj", color=(255, 0, 0))
+        rendered_text = self.correct_font.render(text="Ahoj", fgcolor=(255, 0, 0))
         self.assertIsNotNone(rendered_text[1], "Render method should return a rect.")
         # Check the height, width
         self.assertEqual(rendered_text[1].height, self.correct_font.font_height)
@@ -152,7 +152,7 @@ class TestBitmapFontFixedHeight(unittest.TestCase):
         """Test rendering an empty string."""
         if not self.test_surface: self.skipTest("Pygame screen not available for rendering test.")
 
-        rendered_text = self.correct_font.render(text="", color=(255,255,255))
+        rendered_text = self.correct_font.render(text="", fgcolor=(255,255,255))
         self.assertIsNotNone(rendered_text)
         self.assertEqual(rendered_text[1].width, 0, "Rendering empty string should result in zero width.")
 
@@ -160,7 +160,7 @@ class TestBitmapFontFixedHeight(unittest.TestCase):
         """Test rendering text with characters not in the font."""
         if not self.test_surface: self.skipTest("Pygame screen not available for rendering test.")
         # Assuming 'š' is not in your correct_font.json
-        rendered_text = self.correct_font.render(text='AšA', color=(255,255,255))
+        rendered_text = self.correct_font.render(text='AšA', fgcolor=(255,255,255))
         # By default is substituted with the _ character if exists in the font
         underscore_char = self.correct_font.render(text='_')
         a_character_char = self.correct_font.render(text='A')

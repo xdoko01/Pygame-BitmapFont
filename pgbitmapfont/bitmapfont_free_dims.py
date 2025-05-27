@@ -166,8 +166,8 @@ class BitmapFontFreeDims(BitmapFontProtocol):
             (self._get_text_height() + self.spacing[1]) * len(text.split('\n'))
         )
 
-    def render(self, text: str, align: str='LEFT') -> tuple[pygame.Surface, pygame.Rect]:
-        ''' Renders given text in given color and in given
+    def render(self, text: str, fgcolor:pygame.Color=None, align: str='LEFT') -> tuple[pygame.Surface, pygame.Rect]:
+        ''' Renders given text in given
         alignment to the new surface.
         '''
 

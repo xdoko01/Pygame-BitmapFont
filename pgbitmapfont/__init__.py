@@ -28,7 +28,7 @@ class BitmapFontProtocol(Protocol):
     def get_rect(self, text: str) -> pygame.Rect:
         pass
 
-    def render(self, text: str) -> tuple[pygame.Surface, pygame.Rect]:
+    def render(self, text: str, fgcolor: pygame.Color) -> tuple[pygame.Surface, pygame.Rect]:
         pass
 
 ########################################################
@@ -111,7 +111,7 @@ class BitmapFont:
 
         if 'character_order' in font_data:
             instance = super().__new__(BitmapFontFixedHeight)
-            instance.__init__(path=path, size=size, spacing=spacing, color=kwargs.get('color'), default_char=default_char)
+            instance.__init__(path=path, size=size, spacing=spacing, fgcolor=kwargs.get('color'), default_char=default_char)
             return instance
         else:
             instance = super().__new__(BitmapFontFreeDims)

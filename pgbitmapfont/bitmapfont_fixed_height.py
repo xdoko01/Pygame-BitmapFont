@@ -47,7 +47,7 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
 
     __slots__ = ['font_height', 'font_img', 'font_color', 'colorkey', 'spacing', 'characters', 'default_char']
 
-    def __init__(self, path: Path, size: int=None, color: pygame.Color=None, spacing: tuple[int, int]=(1,1), default_char: str='_'):
+    def __init__(self, path: Path, size: int=None, fgcolor: pygame.Color=None, spacing: tuple[int, int]=(1,1), default_char: str='_'):
         ''' Prepare bitmap font from predefined path in given size and color.
 
         Parameters:
@@ -57,8 +57,8 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
             :param size: Size of the font in pixels. Default value is hight of the font_image file.
             :type size: int
 
-            :param color: Color of the font. Swaps default font_color with required color. If None, the font stays as is (textured fonts).
-            :type color: pygame.Color
+            :param fgcolor: Color of the font. Swaps default font_color with required color. If None, the font stays as is (textured fonts).
+            :type fgcolor: pygame.Color
 
             :param spacing: Horizontal and vertical space between the characters in px.
             :type spacing: tuple[int, int]
@@ -84,7 +84,7 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
 
         # Set color
         try:
-            assert ('font_color' in font_data and color) or not color, f"Missing 'font_color' key."
+            assert ('font_color' in font_data and fgcolor) or not fgcolor, f"Missing 'font_color' key."
             self.font_color = pygame.Color(font_data.get('font_color'))
         except AssertionError:
             raise ValueError
@@ -160,8 +160,8 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
         self.default_char = default_char if default_char in self.characters else character_order[0][0]
 
         # Change color if required
-        if color is not None:
-            self.font_img = color_swap(self.font_img, self.font_color, color)
+        if fgcolor is not None:
+            self.font_img = color_swap(self.font_img, self.font_color, fgcolor)
 
         # Scale also the font image
         self.font_img = pygame.transform.scale(self.font_img, (int(self.font_img.get_width() * scale), int(self.font_img.get_height() * scale)))
@@ -225,12 +225,12 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
             (self._get_text_height() + self.spacing[1]) * len(text.split('\n'))
             )
 
-    def render(self, text: str, color: pygame.Color=None, align: str='LEFT') -> tuple[pygame.Surface, pygame.Rect]:
+    def render(self, text: str, fgcolor: pygame.Color=None, align: str='LEFT') -> tuple[pygame.Surface, pygame.Rect]:
         ''' Renders given text in given color and in given
         alignment to the new surface.
         '''
 
-        assert color != self.colorkey, 'Color cannot be the same as the color key'
+        assert fgcolor != self.colorkey, 'Color cannot be the same as the color key'
 
         # Generate each row on a separate surface
         rows_surfaces = []
@@ -276,8 +276,8 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
             final_surface.blit(row_surface, (x_align, i * (self._get_text_height() + self.spacing[1])))
 
             # Change color as required
-            if color is not None:
-                final_surface = color_swap(final_surface, self.font_color, color)
+            if fgcolor is not None:
+                final_surface = color_swap(final_surface, self.font_color, fgcolor)
 
         # Must set colorkey otherwise background will not be transparent
         final_surface.set_colorkey(self.colorkey)

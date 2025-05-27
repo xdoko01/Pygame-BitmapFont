@@ -111,7 +111,7 @@ class TestBitmapFontFreeDims(unittest.TestCase):
         # Clear surface
         self.test_surface.fill((0,0,0))
         # Render
-        rendered_text = self.correct_font.render(text="Ahoj")
+        rendered_text = self.correct_font.render(text="Ahoj", fgcolor=pygame.Color('blue'))
         self.assertIsNotNone(rendered_text[1], "Render method should return a rect.")
         # Check the height, width
         self.assertEqual(rendered_text[1].height, self.correct_font.font_height)
