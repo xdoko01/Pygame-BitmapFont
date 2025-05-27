@@ -166,6 +166,11 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
         # Scale also the font image
         self.font_img = pygame.transform.scale(self.font_img, (int(self.font_img.get_width() * scale), int(self.font_img.get_height() * scale)))
 
+    def _substitute_unsuported_chars(self, text: str) -> str:
+        '''Cleans the text from characters that are not supported
+        by the font and substitutes them with the default character.
+        '''
+        return ''.join(list(map(lambda c: c if c in self.characters else self.default_char, text)))
 
     def _get_text_width(self, text: str) -> int:
         ''' Returns width in pixels of the given text.
@@ -179,12 +184,6 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
         ''' Returns height in pixels of the given text
         '''
         return self.font_height
-
-    def _substitute_unsuported_chars(self, text: str) -> str:
-        '''Cleans the text from characters that are not supported
-        by the font and substitutes them with the default character.
-        '''
-        return ''.join(list(map(lambda c: c if c in self.characters else self.default_char, text)))
 
     def _render_row(self, text: str) -> pygame.Surface:
         ''' Returns surface containing text in a row.
@@ -216,20 +215,15 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
 
         return row_surf
 
-    def get_text_dim(self, text: str) -> tuple[int, int]:
-        ''' Return the dimensions of the surface with generated text.
-        '''
-        return (max([self._get_text_width(row_text) for row_text in text.split('\n')]), (self._get_text_height() + self.spacing[1]) * len(text.split('\n')))
-
     def get_rect(self, text: str) -> pygame.Rect:
         ''' Return the dimensions of the surface with generated text as a pygame.Rect.
         '''
         return pygame.Rect(
             0, 
             0, 
-            max([self._get_text_width(row_text) for row_text in text.split('\n')]), 
+            max([self._get_text_width(self._substitute_unsuported_chars(row_text)) for row_text in text.split('\n')]), 
             (self._get_text_height() + self.spacing[1]) * len(text.split('\n'))
-        )
+            )
 
     def render(self, text: str, color: pygame.Color=None, align: str='LEFT') -> tuple[pygame.Surface, pygame.Rect]:
         ''' Renders given text in given color and in given

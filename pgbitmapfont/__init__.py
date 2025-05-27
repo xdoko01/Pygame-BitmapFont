@@ -20,7 +20,7 @@ from typing import Protocol
 
 class BitmapFontProtocol(Protocol):
     """Interface all bitmap fonts must implement"""
-    def __init__(self, path: str, size: int):
+    def __init__(self, path: Path, size: int):
         pass
 
     def get_rect(self, text: str) -> pygame.Rect:
