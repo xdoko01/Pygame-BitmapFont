@@ -110,4 +110,4 @@ Tips
   - [ ] FreeDim font having different heights of characters
   - [ ] Usage of default colorkey
   - [ ] Adding spaces vertical/horizontal
-  - [ ] Dummy pgcolor for FreeDim font
+  - [ ] Dummy fgcolor for FreeDim font

@@ -156,6 +156,20 @@ class BitmapFontFreeDims(BitmapFontProtocol):
 
         return row_surf
 
+    def get_metrics(self, text: str) -> list[tuple[int, int, int, int, int, int]]:
+        '''Must be implemented due to compatibility with pygame.freetype.Font.
+        Returns dimension of the text (min_x, max_x, min_y, max_y, horizontal_advance_x, horizontal_advance_y).
+        In case of BitmapFont min_x = max_x = horizontal_advance_x = width and same for y.
+        '''
+        res = []
+        
+        for char in text:
+            x = self.characters[char]['width'] + self.spacing[0]
+            y = self.characters[char]['height'] + self.spacing[1]
+            res.append((x,x,y,y,x,y))
+        
+        return res
+
     def get_rect(self, text: str) -> pygame.Rect:
         ''' Return the dimensions of the surface with generated text as a pygame Rect.
         '''
