@@ -104,3 +104,5 @@ bitmapfont-extract --img font_image.png --out font.json
 Tips
  - once saved, the cell is grey
 
+#TODO
+ - [ ] check tests 
