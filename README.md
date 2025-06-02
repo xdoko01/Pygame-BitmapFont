@@ -104,10 +104,3 @@ bitmapfont-extract --img font_image.png --out font.json
 Tips
  - once saved, the cell is grey
 
-## TODOs
- 
- - [ ] More test cases
-  - [ ] FreeDim font having different heights of characters
-  - [ ] Usage of default colorkey
-  - [ ] Adding spaces vertical/horizontal
-  - [ ] Dummy fgcolor for FreeDim font

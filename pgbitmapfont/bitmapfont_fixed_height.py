@@ -166,12 +166,6 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
         # Scale also the font image
         self.font_img = pygame.transform.scale(self.font_img, (int(self.font_img.get_width() * scale), int(self.font_img.get_height() * scale)))
 
-    def _substitute_unsuported_chars(self, text: str) -> str:
-        '''Cleans the text from characters that are not supported
-        by the font and substitutes them with the default character.
-        '''
-        return ''.join(list(map(lambda c: c if c in self.characters else self.default_char, text)))
-
     def _get_text_width(self, text: str) -> int:
         ''' Returns width in pixels of the given text.
         It is used internally tin render function to determine the final dimensions
@@ -184,6 +178,12 @@ class BitmapFontFixedHeight(BitmapFontProtocol):
         ''' Returns height in pixels of the given text
         '''
         return self.font_height
+
+    def _substitute_unsuported_chars(self, text: str) -> str:
+        '''Cleans the text from characters that are not supported
+        by the font and substitutes them with the default character.
+        '''
+        return ''.join(list(map(lambda c: c if c in self.characters else self.default_char, text)))
 
     def _render_row(self, text: str) -> pygame.Surface:
         ''' Returns surface containing text in a row.

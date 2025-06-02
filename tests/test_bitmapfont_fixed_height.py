@@ -56,7 +56,7 @@ class TestBitmapFontFixedHeight(unittest.TestCase):
         # but often it's better to load it once if it's read-only.
         self.correct_font = BitmapFont(path=TEST_FIXED_HEIGHT_CORRECT_FONT)
         # Create scaled font
-        self.scaled_font = BitmapFont(path=TEST_FIXED_HEIGHT_CORRECT_FONT, size=32)
+        self.scaled_font = BitmapFont(path=TEST_FIXED_HEIGHT_CORRECT_FONT, size=32, spacing=[2,2])
 
         if TestBitmapFontFixedHeight.screen:
             self.test_surface = pygame.Surface((100, 50)) # A small surface for rendering tests
@@ -144,9 +144,8 @@ class TestBitmapFontFixedHeight(unittest.TestCase):
         rendered_text = self.scaled_font.render(text="Ahoj")
         self.assertIsNotNone(rendered_text[1], "Render method should return a rect.")
         # Check the height is equal to size
-        print(f'{rendered_text=},{rendered_text[1].height=}, {self.scaled_font.font_height=}')
-        self.assertEqual(rendered_text[1].height, self.scaled_font.font_height)
-        self.assertEqual(rendered_text[1].height, 32)
+        self.assertEqual(self.scaled_font.font_height, 32)
+        self.assertEqual(rendered_text[1].height, self.scaled_font.font_height + self.scaled_font.spacing[1])
 
     def test_render_empty_text(self):
         """Test rendering an empty string."""
@@ -171,7 +170,7 @@ class TestBitmapFontFixedHeight(unittest.TestCase):
 
     # 3. Text Measurement / Metrics (if applicable)
     def test_text_width(self):
-        """Test that the dimensions are reflecting characters and spoacing"""
+        """Test that the dimensions are reflecting characters and spacing"""
         width_A = self.correct_font.render('A')[1].width
         width_B = self.correct_font.render('B')[1].width
         width_AB = self.correct_font.render('AB')[1].width
@@ -189,6 +188,42 @@ class TestBitmapFontFixedHeight(unittest.TestCase):
 
         self.assertEqual(width_AB, width_A + width_B + self.correct_font.spacing[0])
         self.assertEqual(width_empty, 0)
+
+    def test_get_metrics_width(self):
+        """Test that the dimensions are reflecting characters and spacing"""
+
+        test_string = 'Hello'
+
+        test_get_metrics = self.correct_font.get_metrics(test_string)
+        test_get_metrics_sum_min_x = sum([c[0] for c in test_get_metrics])
+        test_get_metrics_sum_max_x = sum([c[1] for c in test_get_metrics])
+        test_get_metrics_sum_hor_adv_x = sum([c[4] for c in test_get_metrics])
+
+        test_render = self.correct_font.render(test_string)[1]
+        test_get_rect = self.correct_font.get_rect(test_string)
+
+        self.assertEqual(test_get_metrics_sum_min_x, test_get_metrics_sum_max_x)
+        self.assertEqual(test_get_metrics_sum_max_x, test_get_metrics_sum_hor_adv_x)
+        self.assertEqual(test_get_metrics_sum_max_x, test_render.width)
+        self.assertEqual(test_get_metrics_sum_max_x, test_get_rect.width)
+
+    def test_get_metrics_scaled_width(self):
+        """Test that the dimensions are reflecting characters and spacing when scaled"""
+
+        test_string = 'Hello'
+
+        test_get_metrics = self.scaled_font.get_metrics(test_string)
+        test_get_metrics_sum_min_x = sum([c[0] for c in test_get_metrics])
+        test_get_metrics_sum_max_x = sum([c[1] for c in test_get_metrics])
+        test_get_metrics_sum_hor_adv_x = sum([c[4] for c in test_get_metrics])
+
+        test_render = self.scaled_font.render(test_string)[1]
+        test_get_rect = self.scaled_font.get_rect(test_string)
+
+        self.assertEqual(test_get_metrics_sum_min_x, test_get_metrics_sum_max_x)
+        self.assertEqual(test_get_metrics_sum_max_x, test_get_metrics_sum_hor_adv_x)
+        self.assertEqual(test_get_metrics_sum_max_x, test_render.width)
+        self.assertEqual(test_get_metrics_sum_max_x, test_get_rect.width)
 
 
 if __name__ == '__main__':

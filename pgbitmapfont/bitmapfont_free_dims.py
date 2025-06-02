@@ -9,6 +9,11 @@
         - font_image - Specifies path to the bitmap picture with the font. It can be either path relative to the font's
             JSON file or path relative to the project (CWD directory).
 
+        - font_color - Specifies the color of the font. It is used when the user
+            wants to change the color of the font (substitute font_color by other
+            color). The value is only used in case that color attribute is present when instance
+            of the font is created. Otherwise, the font images are used as they are.
+
         - colorkey - Specifies the background color of the font image. It is needed for
             keying-out the color in the font image.
 
@@ -40,7 +45,7 @@
         ...
 '''
 import pygame
-from . import BitmapFontProtocol, load_font_data_from_file, load_font_image
+from . import BitmapFontProtocol, load_font_data_from_file, load_font_image, color_swap
 from pathlib import Path
 
 class BitmapFontFreeDims(BitmapFontProtocol):
@@ -48,9 +53,9 @@ class BitmapFontFreeDims(BitmapFontProtocol):
     json file specifiing position and dimension of individual font characters.
     '''
 
-    __slots__ = ['font_height', 'font_img', 'colorkey', 'spacing', 'characters', 'default_char']
+    __slots__ = ['font_height', 'font_img', 'font_color', 'colorkey', 'spacing', 'characters', 'default_char']
 
-    def __init__(self, path: Path, size: int=None, spacing: tuple[int, int]=(0,0), default_char: str='_'):
+    def __init__(self, path: Path, size: int=None, fgcolor:pygame.Color=None, spacing: tuple[int, int]=(0,0), default_char: str='_'):
         ''' Prepare bitmap font from predefined path in given size and color.
 
         Parameters:
@@ -59,6 +64,9 @@ class BitmapFontFreeDims(BitmapFontProtocol):
 
             :param size: Size is scale factor of the whole font
             :type size: int
+
+            :param fgcolor: Color of the font. Swaps default font_color with required color. If None, the font stays as is (textured fonts).
+            :type fgcolor: pygame.Color
 
             :param spacing: Horizontal and vertical space between the characters in px.
             :type spacing: tuple[int, int]
@@ -73,10 +81,26 @@ class BitmapFontFreeDims(BitmapFontProtocol):
         font_data = load_font_data_from_file(path=path)
 
         # Get font image based on the font data
-        self.font_img = load_font_image(path=path, font_image=font_data['font_image'])
-
-        # Get colorkey to correctly prepare the transparent parts of the font image
-        self.colorkey = pygame.Color(font_data.get('colorkey', '#000000'))
+        try:
+            assert 'font_image' in font_data, f"Missing 'font_image' key."
+            self.font_img = load_font_image(path=path, font_image=font_data['font_image'])
+        except AssertionError:
+            raise ValueError
+        
+        # Set color
+        try:
+            assert ('font_color' in font_data and fgcolor) or not fgcolor, f"Missing 'font_color' key."
+            self.font_color = font_data.get('font_color') 
+            if self.font_color: self.font_color = pygame.Color(self.font_color)
+        except AssertionError:
+            raise ValueError
+        
+        # Set colorkey to correctly prepare the transparent parts of the font image
+        try:
+            self.colorkey = pygame.Color(font_data.get('colorkey', '#000000'))
+            assert self.font_color != self.colorkey, 'Color cannot be the same as the color key'
+        except AssertionError:
+            raise ValueError
 
         # Set colorkey - for proper transparency
         self.font_img.set_colorkey(self.colorkey)
@@ -84,7 +108,7 @@ class BitmapFontFreeDims(BitmapFontProtocol):
         # How many pixels of space between characters
         self.spacing = spacing
 
-        # Store the original font height
+        # Store the original font height max of all characters
         font_height = max(font_data['chars'][char]['height'] for char in font_data['chars'])
 
         # Calculate the scaling factor for the font size
@@ -105,6 +129,10 @@ class BitmapFontFreeDims(BitmapFontProtocol):
         # Default_char is not defined in the font file, use the first font character instead
         self.default_char = default_char if default_char in self.characters else next(iter(self.characters))
 
+        # Change color if required
+        if fgcolor is not None:
+            self.font_img = color_swap(self.font_img, self.font_color, fgcolor)
+
         # Scale also the font image
         self.font_img = pygame.transform.scale(self.font_img, (int(self.font_img.get_width() * scale), int(self.font_img.get_height() * scale)))
 
@@ -116,9 +144,11 @@ class BitmapFontFreeDims(BitmapFontProtocol):
         return sum([self.characters[char]['width'] for char in text]) + (self.spacing[0] * len(text))
 
     def _get_text_height(self, text: str=None)-> int:
-        ''' Returns height in pixels of the given text
+        ''' Returns height in pixels of the given text - without spacing because this function
+        is used in _render_row.
         '''
-        return self.font_height
+        return max([self.characters[char]['height'] for char in text]) if text else self.font_height
+        #return self.font_height
 
     def _substitute_unsuported_chars(self, text: str) -> str:
         '''Cleans the text from characters that are not supported
@@ -188,6 +218,7 @@ class BitmapFontFreeDims(BitmapFontProtocol):
         # Generate each row on a separate surface
         rows_surfaces = []
         max_width = 0 # Store the width of the longest line
+        total_height = 0 # Store sum of heights of individual lines + spacing
 
         # Prepare individual surface for every row
         for row_text in text.split('\n'):
@@ -198,14 +229,17 @@ class BitmapFontFreeDims(BitmapFontProtocol):
             # Update the max row width value
             max_width = max(max_width, row_surf.get_width())
 
+            # Update total_height
+            total_height += row_surf.height + self.spacing[1]
+
             # Add to the list of row surfaces
             rows_surfaces.append(row_surf)
         
         # Store the height of the whole text surface
-        height = (self._get_text_height() + self.spacing[1]) * len(rows_surfaces)
+        #height = (self._get_text_height() + self.spacing[1]) * len(rows_surfaces)
 
         # Generate the new surface
-        final_surface = pygame.Surface((max_width, height))
+        final_surface = pygame.Surface((max_width, total_height))
 
         # Fill the surface with the font background color
         final_surface.fill(self.colorkey)
@@ -226,11 +260,11 @@ class BitmapFontFreeDims(BitmapFontProtocol):
             else:
                 x_align = 0
 
-            final_surface.blit(row_surface, (x_align, i * (self._get_text_height() + self.spacing[1])))
+            final_surface.blit(row_surface, (x_align, i * (row_surface.height + self.spacing[1])))
 
         # Must set colorkey otherwise background will not be transparent
         final_surface.set_colorkey(self.colorkey)
 
-        return (final_surface, pygame.Rect(0, 0, max_width, height))
+        return (final_surface, pygame.Rect(0, 0, max_width, total_height))
 
 

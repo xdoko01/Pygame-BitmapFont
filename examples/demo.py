@@ -20,20 +20,20 @@ screen = pygame.display.set_mode((800, 800))
 FONT_PATH = pathlib.Path('examples/fonts')
 
 # Fixed Height formats fonts examples
-my_first_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json', color=pygame.Color('grey'))
+my_first_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json', fgcolor=pygame.Color('grey'))
 my_second_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json',  size=16)
-my_third_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json', size=8, color=pygame.Color('brown'))
+my_third_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'small_font.json', size=8, fgcolor=pygame.Color('brown'))
 my_fourth_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'red_gradient_capital_font.json', size=16, spacing=(2,5))
-my_fifth_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'good_neighbours_font.json', size=32, color=pygame.Color('orange'))
+my_fifth_fixed_height_font = BitmapFontFixedHeight(path=FONT_PATH / 'good_neighbours_font.json', size=32, fgcolor=pygame.Color('orange'))
 
 # Free Dimension fonts examples
 my_first_free_dims_font = BitmapFontFreeDims(path=FONT_PATH / 'charset_id1.json')
-my_second_free_dims_font = BitmapFontFreeDims(path=FONT_PATH / 'simple.json')
+my_second_free_dims_font = BitmapFontFreeDims(path=FONT_PATH / 'simple.json', fgcolor=(255,255,255))
 my_third_free_dims_font = BitmapFontFreeDims(path=FONT_PATH / 'charset_id5.json')
 my_fourth_free_dims_font = BitmapFontFreeDims(path=FONT_PATH / 'charset_moon1.json')
 
-bm_font1 = BitmapFont(path=FONT_PATH / 'small_font.json', color=pygame.Color('green'), size=32, spacing=(1,1))
-bm_font2 = BitmapFont(path=FONT_PATH / 'charset_id1.json', color=pygame.Color(128,128,0), size=40)
+bm_font1 = BitmapFont(path=FONT_PATH / 'small_font.json', fgcolor=pygame.Color('green'), size=32, spacing=(1,1))
+bm_font2 = BitmapFont(path=FONT_PATH / 'charset_id1.json', size=40)
 
 
 while True:

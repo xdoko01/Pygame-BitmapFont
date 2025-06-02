@@ -1,6 +1,7 @@
 {
     "font_image": "simple.png",
     "colorkey": "#FF00FF",
+    "font_color": [118,58,40],
     "chars": {
         "A": {
             "width": 16,
