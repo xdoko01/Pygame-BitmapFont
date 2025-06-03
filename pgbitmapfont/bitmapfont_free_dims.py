@@ -147,8 +147,8 @@ class BitmapFontFreeDims(BitmapFontProtocol):
         ''' Returns height in pixels of the given text - without spacing because this function
         is used in _render_row.
         '''
-        return max([self.characters[char]['height'] for char in text]) if text else self.font_height
-        #return self.font_height
+        #return max([self.characters[char]['height'] for char in text]) if text else self.font_height
+        return self.font_height
 
     def _substitute_unsuported_chars(self, text: str) -> str:
         '''Cleans the text from characters that are not supported
@@ -218,7 +218,6 @@ class BitmapFontFreeDims(BitmapFontProtocol):
         # Generate each row on a separate surface
         rows_surfaces = []
         max_width = 0 # Store the width of the longest line
-        total_height = 0 # Store sum of heights of individual lines + spacing
 
         # Prepare individual surface for every row
         for row_text in text.split('\n'):
@@ -229,17 +228,14 @@ class BitmapFontFreeDims(BitmapFontProtocol):
             # Update the max row width value
             max_width = max(max_width, row_surf.get_width())
 
-            # Update total_height
-            total_height += row_surf.height + self.spacing[1]
-
             # Add to the list of row surfaces
             rows_surfaces.append(row_surf)
         
         # Store the height of the whole text surface
-        #height = (self._get_text_height() + self.spacing[1]) * len(rows_surfaces)
+        height = (self._get_text_height() + self.spacing[1]) * len(rows_surfaces)
 
         # Generate the new surface
-        final_surface = pygame.Surface((max_width, total_height))
+        final_surface = pygame.Surface((max_width, height))
 
         # Fill the surface with the font background color
         final_surface.fill(self.colorkey)
@@ -260,11 +256,11 @@ class BitmapFontFreeDims(BitmapFontProtocol):
             else:
                 x_align = 0
 
-            final_surface.blit(row_surface, (x_align, i * (row_surface.height + self.spacing[1])))
+            final_surface.blit(row_surface, (x_align, i * (row_surface.get_height() + self.spacing[1])))
 
         # Must set colorkey otherwise background will not be transparent
         final_surface.set_colorkey(self.colorkey)
 
-        return (final_surface, pygame.Rect(0, 0, max_width, total_height))
+        return (final_surface, pygame.Rect(0, 0, max_width, height))
 
 
